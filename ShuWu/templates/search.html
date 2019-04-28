@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h4><em>一共检索到<strong> {{book_count}} </strong>条信息</em></h4><br>
+{% for book in books %}
+<div style="height: 102px;  margin: 10px 0;">
+  <div class="book_img" style="float: left; margin-right: 12px;">
+    <a href="{% url 'books:book' book_id=book.id %}" target="_blank">
+      <img src="{{ book.img_url }}" alt="暂无封面">
+    </a>
+  </div>
+  <div style="width: auto;">
+    <a href="{% url 'books:book' book_id=book.id %}">
+      <strong>{{ book.book_name }}</strong></a> &nbsp;
+    <small><a href="{% url 'books:author' %}?msg={{ book.author }}">{{ book.author }}</a> 著</small>
+    <br>
+    <small style="color: #666">{{ book.intro }}</small>
+  </div>
+</div>
+{% endfor %}
+{% endblock %}

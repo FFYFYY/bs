@@ -1,182 +1,91 @@
-<!DOCTYPE html>
-{% load static %}
+{% extends 'base.html' %}
 
-<html>
-<head>
-  <title>书屋</title>
-  <meta charset="utf8">
-  <link rel="icon" href="{% static 'img/favicon.ico' %}"/>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css">
-  <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"></script>
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+{% block content %}
+{% if user.is_authenticated %}
 
-    body {
-      background-color: rgba(243, 255, 162, 0.56);
-      height: 100%;
-      width: 100%;
-      padding: 0;
-      margin: 0;
-    }
-
-    a {
-      color: black;
-
-    }
-
-    a:focus, a:hover {
-      text-decoration: none;
-    }
-
-    .nav-pills li {
-      padding: 0 -2px;
-    }
-
-    .nav-pills li a {
-      border-radius: 0;
-    }
-
-    .btn-primary {
-      background-color: #afbf76;
-      border-color: #afbf76;
-    }
-
-    .book_img {
-      float: left;
-      margin-right: 12px;
-      width: 80px;
-      height: 100px;
-      overflow: hidden;
-
-    }
-
-    .book_img img {
-      width: 100%;
-      height: 100%;
-      transition: all .3s;
-    }
-
-    .book_img img:hover {
-      transform: scale(1.1);
-    }
-
-  </style>
-</head>
-
-<body>
-<div class="container" style="height:100%;">
-  <div class="col-lg-12">
-    <div class="col-lg-6"><h1>书屋</h1></div>
-    <div class="col-lg-6 text-right" style="margin-top: 30px;">
-      {% if user.is_authenticated %}
-        <div class="dropdown" style="display: inline-block;">
-          <p style="display: inline-block;" class="dropdown-toggle" data-toggle="dropdown" role="button">{{ user.username }} 
-            <span class="caret"></span></p>
-          <ul class="dropdown-menu dropdown-menu-right" style="min-width:100%;">
-            {% if user.is_staff or user.is_superuser %}
-            <li><a href="{% url 'admin:index' %}" target="_blank">后台管理</a></li>
-                <li role="separator" class="divider"></li>
-            {% endif %}
-            <li><a href="{% url 'books:logout' %}?from={{ request.get_full_path }}">退出登录</a></li>
-          </ul>
-        </div>
-      {% else %}
-      <a href="{% url 'books:login' %}">登录</a> &nbsp; <a href="{% url 'books:register' %}">注册</a>
-      {% endif %}
-    </div>
-  </div>
-  <div class="col-lg-4 col-md-offset-4 input-group" style="margin-bottom: 20px;">
-    <form action="{% url 'books:search' %}" method="post">
-        {% csrf_token %}
-        <div class="form-group col-lg-10" style="margin-right: 0;">
-          <input type="text" class="form-control" name="msg" required="required" placeholder="不要有错字哦">
-        </div>
-      <button type="submit" style="border-radius: 0; margin-left: : 0;" class="btn btn-primary">搜索</button>
-    </form>
-    <!-- <form>
-
-    <input type="text" class="form-control" placeholder="" aria-describedby="basic-addon2">
-    <span class="input-group-btn">
-        <button class="btn btn-primary" style="margin-bottom: 20px;" type="button">搜索</button>
-      </span>
-    </form> -->
-  </div>
-
-
-  <div style="background-color: #afbf76; border-bottom: 3px solid black;">
-    <ul class="nav nav-pills nav-justified" id="myTab">
-      <li class="active"><a href="#my_books" data-toggle="tab">我的书架</a></li>
-      <li><a href="#xiuzhen" data-toggle="tab">修真</a></li>
-      <li><a href="#xianxia" data-toggle="tab">修仙</a></li>
-      <li><a href="#wuxia" data-toggle="tab">武侠</a></li>
-      <li><a href="#lishi" data-toggle="tab">历史</a></li>
-      <li><a href="#dushi" data-toggle="tab">都市</a></li>
-    </ul>
-  </div>
-
-  <div
-      style="overflow:hidden;border:2px solid #afbf76;border-top: none; border-bottom-left-radius: 4px; border-bottom-right-radius: 4px; min-height: 400px; margin-bottom: 100px;">
-    <div style="">
-      <div class="tab-content">
-
-        <div role="tabpanel" class="tab-pane active" id="my_books">
-          {% if user.is_authenticated %}
-
-          {% for book in books %}
-
-          {% empty %}
-          您暂无收藏的书籍
-          {% endfor %}
-
-          {% else %}
-
-          {% endif %}
-
-          {% for book in books %}
-
-          <div class="col-lg-4">
-            <div style="height: 102px;  margin: 10px 0;">
-              <div class="book_img" style="float: left; margin-right: 12px;">
-                <a href="" target="_blank">
-                  <img src="{{ book.img_url }}" alt="暂无封面">
-                </a>
-              </div>
-              <div style="width: auto;">
-                <strong>{{ book.book_name }}</strong> &nbsp;
-                <small>{{ book.author }} 著</small>
-                <br>
-                <small style="color: #666">{{ book.intro|truncatechars:60 }}</small>
-              </div>
-            </div>
-          </div>
-
-          {% empty %}
-          您暂无收藏的书籍
-          {% endfor %}
-        </div>
-        <div role="tabpanel" class="tab-pane" id="xiuzhen">
-          修真
-        </div>
-        <div role="tabpanel" class="tab-pane" id="xianxia">
-          仙侠
-        </div>
-        <div role="tabpanel" class="tab-pane" id="wuxia">
-          武侠
-        </div>
-        <div role="tabpanel" class="tab-pane" id="lishi">
-          历史
-        </div>
-        <div role="tabpanel" class="tab-pane" id="dushi">
-          都市
-        </div>
-      </div>
-    </div>
-  </div>
+<div class="panel panel-success">
+	<div class="panel-heading">
+		<h3 class="panel-title">我的书架</h3>
+	</div>
+	<div class="panel-body">
+		<div class="row" id="bookshelf">
+			{% for book in books %}
+			<div class="col-lg-4" id="{{ book.book.id }}">
+				<div style="height: 102px;  margin: 10px 0;">
+					<div class="book_img" style="float: left; margin-right: 12px;">
+						<a href="{% url 'books:book' book_id=book.book.id %}" target="_blank">
+							<img src="{{ book.book.img_url }}" alt="暂无封面">
+						</a>
+					</div>
+					<div style="width: auto;">
+						<a href="{% url 'books:book' book_id=book.book.id %}"><strong>{{ book.book.book_name }}</strong></a><br>
+						<small><a href="{% url 'books:author' %}?msg={{ book.book.author }}">{{ book.book.author }}</a> 著</small>
+						&nbsp;&nbsp;&nbsp;
+						<a  class="btn btn-default btn-xs remove" id="{{ book.book.id }}0">移出书架</a>
+						<br>
+						<small style="color: #666">{{ book.book.intro|truncatechars:60 }}</small>
+					</div>
+				</div>
+			</div>
+			{% empty %}
+			<p class="col-lg-12">书架空空如也 ~~~~</p>
+			{% endfor %}
+		</div>
+	</div>
 </div>
+{% endif %}
+
+<div class="panel panel-success">
+	<div class="panel-heading">
+		<h3 class="panel-title">推荐阅读</h3>
+	</div>
+	<div class="panel-body">
+		<div class="row">
+			{% for book in hot_search_novels %}
+			<div class="col-lg-4">
+				<div style="height: 102px;  margin: 10px 0;">
+					<div class="book_img" style="float: left; margin-right: 12px;">
+						<a href="{% url 'books:book' book_id=book.id %}" target="_blank">
+							<img src="{{ book.img_url }}" alt="暂无封面">
+						</a>
+					</div>
+					<div style="width: auto;">
+						<a href="{% url 'books:book' book_id=book.id %}"><strong>{{ book.book_name }}</strong></a> &nbsp;
+						<small><a href="{% url 'books:author' %}?msg={{ book.author }}">{{ book.author }}</a> 著</small>
+						<br>
+						<small style="color: #666">{{ book.intro|truncatechars:80 }}</small>
+					</div>
+				</div>
+			</div>
+			{% empty %}
+			<p class="col-lg-12">嘟嘟嘟.....发生了某些未知的错误，是外星人入侵了吗，啊啊啊啊.......</p>
+			{% endfor %}
+		</div>
+	</div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+
 <script>
+	$(function(){
+		$(".remove").click(function(){
+			var book_id = $(this).attr('id') / 10;
+			var url = "like/" + book_id;
+			var el_id = '#' + book_id;
+			$.ajax({
+				url: url,
+				success: function(data){	
+					if(data['status']=='SUCCESS'){
+						$(el_id).remove();
+					}
+					else{
+						alert("嘟嘟嘟.....发生了某些未知的错误，是外星人入侵了吗，啊啊啊啊.......");
+					}
+				}});
+		});
+	});
 </script>
-</body>
-</html>
+
+{% endblock%}
