@@ -8,9 +8,10 @@ send_headers = {
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
     "Accept-Language": "zh-CN,zh;q=0.9"}
 
+proxies = {'http':'http://117.93.81.90:53281'}
 
 def get_response(url, charset='utf-8'):
-    response = requests.get(url, headers=send_headers)
+    response = requests.get(url, headers=send_headers, proxies=proxies)
     response.encoding = charset
     return response
 

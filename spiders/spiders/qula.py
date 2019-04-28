@@ -1,19 +1,21 @@
 import requests
 from lxml import etree
 from spiders.storage import stored_books
-from spiders.settings import send_headers, conn, cur
+from spiders.settings import send_headers, conn, cur, proxies
 
 
 def qu_la_spider():
     with open('../message/qula.txt') as f:
         a = int(f.readline())
-    response = requests.get('https://www.qu.la/', headers=send_headers)
+    print()
+    response = requests.get('https://www.qu.la/', headers=send_headers, proxies=proxies)
     response.encoding = 'utf-8'
+    print('hhhhh')
     html = etree.HTML(response.text)
     b = int(html.xpath('//*[@id="newscontent"]/div[2]/ul/li[1]/span[2]/a/@href')[0].split('/')[2])
 
     for i in range(a, b):
-        response = requests.get("https://www.qu.la/book/%s/" % str(i), headers=send_headers)
+        response = requests.get("https://www.qu.la/book/%s/" % str(i), headers=send_headers, proxies=proxies)
         response.encoding = 'utf-8'
         html = etree.HTML(response.text)
         if html:
