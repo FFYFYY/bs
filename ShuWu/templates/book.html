@@ -1,17 +1,23 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block js %}
+<script src="{% static 'js/jquery.cookie.js' %}"></script>
+
+{% endblock %}
 
 {% block content %}
 
-<div style="height: 102px;  margin: 10px 0;">
+<div style="height: 122px;  margin: 10px 0; padding: 10px;" name="bookdiv" id="{{ book.id }}">
 	<div class="book_img" style="float: left; margin-right: 12px;">
 		<img src="{{ book.img_url }}" alt="暂无封面">
 	</div>
 	<div style="width: auto;">
 		<strong>{{ book.book_name }}</strong> &nbsp;
 		<small><a href="{% url 'books:author' %}?msg={{ book.author }}">{{ book.author }} </a>著</small>
-		 &nbsp;&nbsp;&nbsp;
+		&nbsp;&nbsp;&nbsp;
 		{% if user.is_authenticated %}
-		<a id="like" class="btn btn-default btn-xs" role="button">{{ like }}</a>
+		<a id="like" class="btn btn-default btn-xs" role="button">{% if like %}取消收藏{% else %}加入书架{% endif %}</a>
 		{% else %}
 		<a href="{% url 'books:login' %}?from={{ request.path }}" class="btn btn-default btn-xs">加入书架</a>
 		{% endif %}
@@ -20,27 +26,141 @@
 	</div>
 </div>
 
-{% for url in book_urls %}
-<p>{{url.book_url}}</p>
+<div class="row text-center" style="border-top: 3px solid #000; padding-top: 20px;">
+	<div class="col-lg-6 col-lg-offset-3">
+		{% for url in book_urls %}
+		<div class="row" id="{{ url.id }}">
+			<div class="col-lg-6 list-group-item list-group-item-default main">
+				<a href="{{url.book_url}}" target="_blank">{{ url.book_url }}</a>
+			</div>	
+			<div class="btn-group col-lg-6 side">
+				<button class="btn btn-default" id='rate{{ url.id }}' title="评分">
+					<div style="width: 20px;">
+						<span>{{ url.rate }}</span>
+					</div>
+				</button>
+				<button class="btn btn-default" id="against{{ url.id }}" 
+				onclick="against({{ url.id }})" title="我觉得不行">
+				<div style="min-width: 40px;">
+					<span>{{ url.against }}</span>
+					<span class="glyphicon glyphicon-thumbs-down"></span>
+				</div>
+			</button>
+			<button class="btn btn-default" id="support{{ url.id }}"
+			onclick="support({{ url.id }})" title="赞一个">
+			<div style="min-width: 40px;">
+				<span>{{ url.support }}</span>
+				<span class="glyphicon glyphicon-thumbs-up"></span>
+			</div>
+		</button>
+<!-- 		{% if user.is_staff or user.is_superuser %}
+		<button class="btn btn-default" title="删除">
+			<span class="glyphicon glyphicon-remove"></span>
+		</button>
+		{% endif %} -->
+	</div>
+</div>
 {% endfor %}
+<div class="row">
+	<a onclick="show()" type="button" class="btn list-group-item list-group-item-info col-lg-6" title="添加链接">
+		<span class="glyphicon glyphicon-plus"></span></a>
+	</div>
+	<div class="row" id="addurl" style="display: none;">
+		<div class="col-lg-6" style="border: 1px solid #ddd; padding: 0; border-radius: 4px;">
+			<div style="padding: 20px 0 40px;">
+				<p>一起来分享吧</p>
+				<div class="input-group">
+					<input type="text" class="form-control" name='url' autocomplete="off" placeholder="输入链接">
+					<span class="input-group-btn">
+						<button class="btn btn-default" onclick="submiturl({{ book.id }})" type="button">确定</button>
+					</span>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</div>
+
+
 {% endblock %}
 
 {% block script %}
 <script>
-	$(function(){
-		$("#like").click(function(){
-			$.ajax({
-				url:"{% url 'books:like' book_id=book.id%}",
-				success:function(data){	
-					if(data['status']=='SUCCESS'){
-						if(data['like']){$("#like").html("取消收藏");}
-						else{$("#like").html("加入书架");}
+	
+$(function(){
+	var id = $("[name='bookdiv']").attr('id');
+	if(!$.cookie('book'+id))	$.cookie('book'+id, 1, { expires: 7 });
+});
+
+	$("#like").click(function(){
+		$.ajax({
+			url:"{% url 'books:like' book_id=book.id%}",
+			success:function(data){	
+				if(data['status']=='SUCCESS'){
+					if(data['like']){
+						$("#like").html("取消收藏");
 					}
 					else{
-						alert("嘟嘟嘟.....发生了某些未知的错误，是外星人入侵了吗，啊啊啊啊.......");
+						$("#like").html("加入书架");
 					}
-				}});
+				}
+				else{
+					alert("嘟嘟嘟.....发生了某些未知的错误，是外星人入侵了吗，啊啊啊啊.......");
+				}
+			}
 		});
 	});
+	
+	function against(id){
+		if($.cookie('against'+id)==1) return 0;
+		var x = '#against' + id + ' span:first-child';
+		var y = '#rate' + id + ' span';
+		$.ajax({
+			url:"/against/" + id,
+			success:function(data){
+				$(x).html(data['against']);
+				$(y).html(data['rate']);
+				$.cookie('against'+id, 1, { expires: 7 });
+			},
+		});
+	}
+
+	function support(id){
+		if($.cookie('support'+id)==1) return 0;
+		var x = '#support' + id + ' span:first-child';
+		var y = '#rate' + id + ' span';
+		$.ajax({
+			url: "/support/" + id,
+			success: function(data){
+				$(x).html(data['support']);
+				$(y).html(data['rate']);
+				$.cookie('support'+id, 1, { expires: 7 });
+			},
+		});
+	}
+
+	function show(){
+		$('#addurl').slideToggle("slow");
+	}
+
+	function submiturl(id){
+		surl = $("[name='url']").val();
+		$.ajax({
+			url:'/shareurls/',
+			data:{
+				'surl' : surl,
+				'book_id': id,
+			},
+			success: function(data){				
+				$("[name='url']").val('');
+				$('#addurl').slideToggle("slow");
+				alert(data['msg']);
+			},
+			error: function(){
+				alert('请求信息有误');
+			},
+		});
+	}
+
 </script>
 {% endblock %}

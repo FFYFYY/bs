@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+<div class="row">
+	<div class="col-lg-6">
+		<h4><em>目前共<strong> {{num}} </strong>条信息有待处理</em></h4><br>
+	</div>
+	<div class="col-lg-6" style="text-align: right;">
+		{% if urls.has_previous %}
+		<a href="{% url 'books:manage' %}?page={{ urls.previous_page_number }}" style="margin-right: 20px;">
+			上一页
+		</a>
+		{% endif %}
+
+		{% if urls.has_next %}
+		<a href="{% url 'books:manage' %}?page={{ urls.next_page_number }}">
+			下一页
+		</a>
+		{% endif %}
+	</div>
+</div>
+<table class="table table-hover">
+	<thead>
+		<tr>
+			<th>书名</th>
+			<th>链接</th>
+			<th>删除</th>
+			<th>添加</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for url in urls %}
+		<tr id="{{ url.id }}">
+			<td><a href="{% url 'books:book' book_id=url.book.id %}" target="_blank">{{ url.book.book_name }}</a></td>
+			<td><a href="{{ url.book_url }}" target="_blank">{{ url.book_url }}</a></td>
+			<td onclick="deleteurl({{url.id}})" style="cursor: pointer;">
+				<span class="glyphicon glyphicon-remove"></span></td>
+				<td onclick="addurl({{url.id}})" style="cursor: pointer;">
+					<span class="glyphicon glyphicon-ok"></span></td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+		{% endblock %}
+
+
+		{% block script %}
+
+		<script>
+			function addurl(id) {
+				if(window.confirm("确定添加操作吗？")){
+					$.ajax({
+						url:'/addurl/'+id,
+						success:function(data){
+							$('#'+id).remove();
+						},
+					});
+				}
+			}
+
+			function deleteurl(id){
+				if(window.confirm("确定删除操作吗？")){
+					$.ajax({
+						url:'/deleteurl/'+id,
+						success:function(data){
+							$('#'+id).remove();
+						},
+					});
+				}
+			}
+
+		</script>
+
+		{% endblock %}

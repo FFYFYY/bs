@@ -12,10 +12,25 @@
   <div style="width: auto;">
     <a href="{% url 'books:book' book_id=book.id %}">
       <strong>{{ book.book_name }}</strong></a> &nbsp;
-    <small><a href="{% url 'books:author' %}?msg={{ book.author }}">{{ book.author }}</a> 著</small>
-    <br>
-    <small style="color: #666">{{ book.intro }}</small>
+      <small><a href="{% url 'books:author' %}?msg={{ book.author }}">{{ book.author }}</a> 著</small>
+      <br>
+      <small style="color: #666">{{ book.intro }}</small>
+    </div>
   </div>
-</div>
-{% endfor %}
-{% endblock %}
+
+  {% endfor %}
+
+  <div class="row" style="display: flex; justify-content: center; margin: 20px 0;">
+    {% if books.has_previous %}
+    <a class="btn btn-default" href="{% url 'books:search' %}?msg={{ msg }}&page={{ books.previous_page_number }}" style="margin-right: 20px;">
+      上一页
+    </a>
+    {% endif %}
+    
+    {% if books.has_next %}
+    <a class="btn btn-default" href="{% url 'books:search' %}?msg={{ msg }}&page={{ books.next_page_number }}">
+      下一页
+    </a>
+    {% endif %}
+  </div>
+  {% endblock %}

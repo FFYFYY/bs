@@ -1,4 +1,10 @@
- a {
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+}
+a {
   color: black;
 }
 a:focus, a:hover {
@@ -19,9 +25,13 @@ a:focus, a:hover {
 .book_img img:hover {
   transform: scale(1.1);
 }
-.search{
+.search {
   background: none;
   border: none;
   margin-left: -3em;
   color: #aaa;
+}
+.navbar-static-bottom{
+  border-radius: 0!important; 
+  margin-bottom: 0!important;
 }
