@@ -16,5 +16,5 @@ def get_response(url, charset='utf-8'):
     return response
 
 
-conn = MySQLdb.connect(host='127.0.0.1', port=3306, user='zqh', passwd='test123', db='ShuWu', charset='utf8')
+conn = MySQLdb.connect(host='127.0.0.1', port=3306, user='zqh', passwd='244325', db='ShuWu', charset='utf8')
 cur = conn.cursor()
