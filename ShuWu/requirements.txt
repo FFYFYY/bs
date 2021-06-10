@@ -2,7 +2,7 @@ astroid==2.2.5
 certifi==2018.11.29
 chardet==3.0.4
 colorama==0.4.1
-Django==2.1.7
+Django==2.2.24
 get==2018.11.19
 idna==2.8
 isort==4.3.18
